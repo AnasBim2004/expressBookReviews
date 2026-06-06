@@ -1,17 +1,17 @@
 const express = require('express');
 const general = express.Router();
 
-// Local book data (same structure as the lab)
+// Local book database (same as in auth_users.js)
 let books = {
     "1": {"title": "The Great Gatsby", "author": "F. Scott Fitzgerald", "reviews": {}},
     "2": {"title": "To Kill a Mockingbird", "author": "Harper Lee", "reviews": {}},
     "3": {"title": "1984", "author": "George Orwell", "reviews": {}}
 };
 
-// Helper function to simulate async (using Promise)
+// Helper to simulate async data fetch (using Promise)
 const getBooksAsync = () => {
     return new Promise((resolve) => {
-        setTimeout(() => resolve(books), 100);
+        setTimeout(() => resolve(books), 10);
     });
 };
 
@@ -58,7 +58,7 @@ general.get("/books/title/:title", async (req, res) => {
     res.json(result);
 });
 
-// GET reviews for a book (by ISBN)
+// GET reviews for a book by ISBN
 general.get("/books/review/:isbn", async (req, res) => {
     const isbn = req.params.isbn;
     const allBooks = await getBooksAsync();
