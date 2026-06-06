@@ -1,43 +1,72 @@
 const express = require('express');
-let books = require("./booksdb.js");
-let isValid = require("./auth_users.js").isValid;
-let users = require("./auth_users.js").users;
-const public_users = express.Router();
+const general = express.Router();
 
+// Local book data (same structure as the lab)
+let books = {
+    "1": {"title": "The Great Gatsby", "author": "F. Scott Fitzgerald", "reviews": {}},
+    "2": {"title": "To Kill a Mockingbird", "author": "Harper Lee", "reviews": {}},
+    "3": {"title": "1984", "author": "George Orwell", "reviews": {}}
+};
 
-public_users.post("/register", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+// Helper function to simulate async (using Promise)
+const getBooksAsync = () => {
+    return new Promise((resolve) => {
+        setTimeout(() => resolve(books), 100);
+    });
+};
+
+// GET all books
+general.get("/books", async (req, res) => {
+    const allBooks = await getBooksAsync();
+    res.json(allBooks);
 });
 
-// Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+// GET book by ISBN
+general.get("/books/isbn/:isbn", async (req, res) => {
+    const isbn = req.params.isbn;
+    const allBooks = await getBooksAsync();
+    if (allBooks[isbn]) {
+        res.json(allBooks[isbn]);
+    } else {
+        res.status(404).json({message: "Book not found"});
+    }
 });
 
-// Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
- });
-  
-// Get book details based on author
-public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+// GET books by author
+general.get("/books/author/:author", async (req, res) => {
+    const author = req.params.author;
+    const allBooks = await getBooksAsync();
+    let result = {};
+    for (let id in allBooks) {
+        if (allBooks[id].author === author) {
+            result[id] = allBooks[id];
+        }
+    }
+    res.json(result);
 });
 
-// Get all books based on title
-public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+// GET books by title
+general.get("/books/title/:title", async (req, res) => {
+    const title = req.params.title;
+    const allBooks = await getBooksAsync();
+    let result = {};
+    for (let id in allBooks) {
+        if (allBooks[id].title === title) {
+            result[id] = allBooks[id];
+        }
+    }
+    res.json(result);
 });
 
-//  Get book review
-public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+// GET reviews for a book (by ISBN)
+general.get("/books/review/:isbn", async (req, res) => {
+    const isbn = req.params.isbn;
+    const allBooks = await getBooksAsync();
+    if (allBooks[isbn]) {
+        res.json({reviews: allBooks[isbn].reviews});
+    } else {
+        res.status(404).json({message: "Book not found"});
+    }
 });
 
-module.exports.general = public_users;
+module.exports.general = general;
